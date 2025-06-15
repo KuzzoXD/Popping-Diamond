@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Diamond Hunter</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Diamond Hunter | Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #FF4757;
             --primary-light: #FF6B81;
+            --primary-dark: #E84118;
             --dark: #2F3542;
             --darker: #1E2029;
             --light: #F1F2F6;
             --success: #2ED573;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
         
         * {
@@ -20,10 +22,11 @@
             margin: 0;
             padding: 0;
             font-family: 'Montserrat', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            background-color: var(--dark);
+            background: linear-gradient(135deg, #2F3542 0%, #1E2029 100%);
             color: var(--light);
             display: flex;
             justify-content: center;
@@ -34,33 +37,52 @@
         
         .game-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             background-color: var(--darker);
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,71,87,0.1) 0%, transparent 70%);
+            z-index: 0;
         }
         
         .game-header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             width: 100%;
+            position: relative;
+            z-index: 1;
         }
         
         .game-title {
-            font-size: 28px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 32px;
             font-weight: 700;
             color: var(--primary);
-            margin-bottom: 8px;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 10px rgba(255, 71, 87, 0.4);
         }
         
         .game-subtitle {
             font-size: 14px;
             color: var(--primary-light);
             opacity: 0.8;
+            font-weight: 600;
         }
         
         .game-info {
@@ -68,18 +90,29 @@
             justify-content: space-between;
             width: 100%;
             margin-bottom: 20px;
-            background-color: rgba(255, 255, 255, 0.05);
-            padding: 12px 16px;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 14px 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 1;
         }
         
         .score, .high-score {
             font-size: 16px;
             font-weight: 600;
+            display: flex;
+            align-items: center;
         }
         
         .score span, .high-score span {
             color: var(--primary);
+            margin-left: 6px;
+            font-weight: 700;
+            min-width: 30px;
+            display: inline-block;
+            text-align: right;
         }
         
         .game-board {
@@ -90,11 +123,13 @@
             width: 100%;
             aspect-ratio: 1/1;
             margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
         }
         
         .cell {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -103,15 +138,32 @@
             position: relative;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
         }
         
         .cell:hover {
             transform: scale(0.97);
-            background-color: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.1);
         }
         
         .cell:active {
             transform: scale(0.95);
+        }
+        
+        .cell::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,71,87,0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .cell:hover::after {
+            opacity: 1;
         }
         
         .icon {
@@ -120,6 +172,7 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
         
         .diamond {
@@ -134,7 +187,7 @@
         
         @keyframes pulse {
             0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 0.9; }
             100% { transform: scale(1); opacity: 1; }
         }
         
@@ -146,29 +199,49 @@
             100% { transform: rotate(0deg); }
         }
         
+        .controls {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
         .btn {
-            background-color: var(--primary);
+            flex: 1;
+            background: var(--primary);
             border: none;
             color: white;
-            padding: 12px 24px;
-            font-size: 16px;
+            padding: 14px;
+            font-size: 14px;
             font-weight: 600;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s ease;
-            width: 100%;
-            max-width: 200px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: var(--shadow);
         }
         
         .btn:hover {
-            background-color: var(--primary-light);
+            background: var(--primary-light);
             transform: translateY(-2px);
         }
         
         .btn:active {
             transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
         
         .game-over, .start-screen {
@@ -177,17 +250,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(30, 32, 41, 0.95);
+            background: rgba(30, 32, 41, 0.95);
+            backdrop-filter: blur(5px);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            border-radius: 16px;
+            border-radius: 20px;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
             padding: 24px;
             text-align: center;
+            z-index: 10;
         }
         
         .game-over.show, .start-screen.show {
@@ -196,15 +271,23 @@
         }
         
         .game-over h2, .start-screen h2 {
-            font-size: 28px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 32px;
             color: var(--primary);
             margin-bottom: 16px;
+            text-shadow: 0 2px 10px rgba(255, 71, 87, 0.4);
         }
         
         .final-score {
             font-size: 18px;
             margin-bottom: 24px;
             color: var(--light);
+            font-weight: 600;
+        }
+        
+        .final-score span {
+            color: var(--primary);
+            font-weight: 700;
         }
         
         .instructions {
@@ -212,6 +295,7 @@
             line-height: 1.6;
             margin-bottom: 24px;
             color: rgba(255, 255, 255, 0.8);
+            max-width: 300px;
         }
         
         .btn-container {
@@ -222,25 +306,43 @@
             max-width: 200px;
         }
         
-        @media (max-width: 400px) {
+        .footer {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 10px;
+            text-align: center;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer span {
+            color: var(--primary);
+        }
+        
+        @media (max-width: 480px) {
             .game-title {
-                font-size: 24px;
+                font-size: 28px;
             }
             
             .game-subtitle {
-                font-size: 12px;
+                font-size: 13px;
             }
             
             .game-info {
-                padding: 10px 12px;
+                padding: 12px 16px;
             }
             
             .score, .high-score {
                 font-size: 14px;
             }
             
-            .game-board {
-                gap: 8px;
+            .controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                padding: 12px;
             }
         }
     </style>
@@ -248,8 +350,8 @@
 <body>
     <div class="game-container">
         <div class="game-header">
-            <h1 class="game-title">Diamond Hunter</h1>
-            <p class="game-subtitle">Tap diamonds • Avoid bombs</p>
+            <h1 class="game-title">DIAMOND HUNTER</h1>
+            <p class="game-subtitle">Premium Edition</p>
         </div>
         
         <div class="game-info">
@@ -259,28 +361,56 @@
         
         <div class="game-board" id="game-board"></div>
         
-        <div class="btn-container">
-            <button class="btn" id="start-btn">Start Game</button>
+        <div class="controls">
+            <button class="btn" id="start-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 3l14 9-14 9V3z"></path>
+                </svg>
+                START
+            </button>
+            <button class="btn btn-secondary" id="pause-btn" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 4h4v16H6zM14 4h4v16h-4z"></path>
+                </svg>
+                PAUSE
+            </button>
+            <button class="btn btn-secondary" id="end-btn" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 6l12 12M6 18L18 6"></path>
+                </svg>
+                END
+            </button>
         </div>
         
+        <p class="footer">Made with <span>❤️</span> in Odisha <span>🇮🇳</span></p>
+        
         <div class="start-screen" id="start-screen">
-            <h2>Diamond Hunter</h2>
+            <h2>DIAMOND HUNTER</h2>
             <p class="instructions">
-                Tap diamonds to score points.<br>
-                Avoid bombs - they end the game!<br>
-                The game speeds up as you score more.<br>
-                Bombs become more frequent too!
+                Tap diamonds to score points. Avoid bombs - they end the game!
+                The game speeds up as you score more and bombs become more frequent.
             </p>
             <div class="btn-container">
-                <button class="btn" id="start-game-btn">Play</button>
+                <button class="btn" id="start-game-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 3l14 9-14 9V3z"></path>
+                    </svg>
+                    PLAY GAME
+                </button>
             </div>
         </div>
         
         <div class="game-over" id="game-over">
-            <h2>Game Over</h2>
+            <h2>GAME OVER</h2>
             <p class="final-score">Your score: <span id="final-score">0</span></p>
             <div class="btn-container">
-                <button class="btn" id="restart-btn">Play Again</button>
+                <button class="btn" id="restart-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12a9 9 0 11-9-9c2.5 0 5 1 7 3"></path>
+                        <path d="M21 3v5h-5"></path>
+                    </svg>
+                    PLAY AGAIN
+                </button>
             </div>
         </div>
     </div>
@@ -296,13 +426,16 @@
             const startBtn = document.getElementById('start-btn');
             const startGameBtn = document.getElementById('start-game-btn');
             const restartBtn = document.getElementById('restart-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const endBtn = document.getElementById('end-btn');
             
             let score = 0;
             let highScore = localStorage.getItem('highScore') || 0;
             let gameActive = false;
-            let speed = 1500; // Initial speed in ms
+            let gamePaused = false;
+            let speed = 1500;
             let spawnInterval;
-            let bombProbability = 0.3; // 30% chance for bomb
+            let bombProbability = 0.3;
             
             highScoreDisplay.textContent = highScore;
             
@@ -321,11 +454,17 @@
                 score = 0;
                 scoreDisplay.textContent = score;
                 gameActive = true;
+                gamePaused = false;
                 speed = 1500;
                 bombProbability = 0.3;
                 
                 gameOverScreen.classList.remove('show');
                 startScreen.classList.remove('show');
+                
+                // Enable/disable buttons
+                pauseBtn.disabled = false;
+                endBtn.disabled = false;
+                pauseBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h4v16H6zM14 4h4v16h-4z"></path></svg> PAUSE`;
                 
                 clearInterval(spawnInterval);
                 clearAllCells();
@@ -333,8 +472,33 @@
                 spawnInterval = setInterval(spawnItems, speed);
             }
             
-            function spawnItems() {
+            function pauseGame() {
                 if (!gameActive) return;
+                
+                gamePaused = !gamePaused;
+                
+                if (gamePaused) {
+                    clearInterval(spawnInterval);
+                    pauseBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"></path></svg> RESUME`;
+                } else {
+                    spawnInterval = setInterval(spawnItems, speed);
+                    pauseBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h4v16H6zM14 4h4v16h-4z"></path></svg> PAUSE`;
+                }
+            }
+            
+            function endGame() {
+                gameActive = false;
+                clearInterval(spawnInterval);
+                finalScoreDisplay.textContent = score;
+                gameOverScreen.classList.add('show');
+                
+                // Disable buttons
+                pauseBtn.disabled = true;
+                endBtn.disabled = true;
+            }
+            
+            function spawnItems() {
+                if (!gameActive || gamePaused) return;
                 
                 clearAllCells();
                 
@@ -369,7 +533,7 @@
             }
             
             function handleCellClick(e) {
-                if (!gameActive) return;
+                if (!gameActive || gamePaused) return;
                 
                 const cell = e.currentTarget;
                 
@@ -396,10 +560,7 @@
                         }
                     } else if (child.classList.contains('bomb')) {
                         // Hit a bomb
-                        gameActive = false;
-                        clearInterval(spawnInterval);
-                        finalScoreDisplay.textContent = score;
-                        gameOverScreen.classList.add('show');
+                        endGame();
                     }
                     
                     cell.innerHTML = '';
@@ -412,20 +573,9 @@
                 });
             }
             
+            // Event listeners
             startBtn.addEventListener('click', () => {
                 startScreen.classList.add('show');
             });
-            
-            startGameBtn.addEventListener('click', startGame);
-            restartBtn.addEventListener('click', startGame);
-            
-            // Prevent zooming on mobile when tapping cells
-            document.addEventListener('touchstart', function(e) {
-                if (e.touches.length > 1) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
-        });
-    </script>
-</body>
-</html>
+
+        
